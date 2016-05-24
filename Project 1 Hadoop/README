@@ -1,0 +1,139 @@
+=======================
+Install hadoop
+=======================
+
+http://hadoop.apache.org/docs/stable/single_node_setup.html
+
+initial test
+
+bin/hadoop fs -put conf input
+
+bin/hadoop jar hadoop-examples-*.jar grep input output 'dfs[a-z.]+'
+
+bin/hadoop fs -get output output 
+
+cat output/*
+
+=======================
+Examples
+=======================
+
+From the hadoop home:
+
+mkdir scripts
+
+- Save scripts in the scripts directory
+
+mkdir scripts/gutemberg
+
+Download the input fiels in gutemberg
+======================
+
+http://www.gutenberg.org/cache/epub/4300/pg4300.txt
+http://www.gutenberg.org/cache/epub/20417/pg20417.txt
+http://www.gutenberg.org/cache/epub/5000/pg5000.txt
+
+
+
+
+=======================
+WORD COUNT IN JAVA
+=======================
+
+mkdir scripts/wordcount_classes
+
+Compile the java jar file
+=========================
+javac -classpath hadoop-core-1.2.1.jar -d scripts/wordcount_classes scripts/WordCount.java
+jar -cvf scripts/wordcount.jar -C scripts/wordcount_classes/ .
+
+ls  scripts/wordcount_classes/org/myorg/WordCount
+WordCount$Map.class     WordCount$Reduce.class  WordCount.class
+
+
+Run the MapReduce job
+=====================
+bin/hadoop jar scripts/wordcount.jar org.myorg.WordCount /user/trilce/gutemberg /user/trilce/gutemberg-java-output
+
+Explore the output
+===================
+bin/hadoop fs -cat gutemberg-java-output/*
+
++++++++++++++++++++
+For more info: 
+http://hadoop.apache.org/docs/stable/mapred_tutorial.html#Overview
+http://hadoop.apache.org/docs/stable/api/overview-summary.html
++++++++++++++++++++
+
+
+
+
+
+=======================
+WORD COUNT IN PYTHON
+=======================
+
+Make sure the codes are executables
+===================================
+chmod +x workdcount-*
+
+
+Test your code locally
+=======================
+echo "foo foo quux labs foo bar quux" | ./wordcount-mapper.py
+
+echo "foo foo quux labs foo bar quux" | ./wordcount-mapper.py | sort -k1,1 | ./wordcount-reducer.py
+
+cat my_input_file.txt | ./wordcount-mapper.py | sort -k1,1 | ./wordcount-reducer.py 
+
+
+
+Copy local example data to HDFS
+================================
+From the hadoop home:
+
+bin/hadoop fs -put scripts/gutenberg gutenberg
+bin/hadoop dfs -ls gutemberg
+Found 3 items
+-rw-r--r--   1 trilce supergroup     674570 2013-09-10 16:43 /user/trilce/gutemberg/pg20417.txt
+-rw-r--r--   1 trilce supergroup    1573150 2013-09-10 16:43 /user/trilce/gutemberg/pg4300.txt
+-rw-r--r--   1 trilce supergroup    1423803 2013-09-10 16:43 /user/trilce/gutemberg/pg5000.txt
+
+
+Run the MapReduce job
+=====================
+From the hadoop home:
+
+bin/hadoop jar contrib/streaming/hadoop-*streaming*.jar -mapper scripts/wordcount-mapper.py -reducer scripts/wordcount-reducer.py -input /user/trilce/gutenberg/* -output /user/trilce/gutemberg-output
+
+bin/hadoop jar contrib/streaming/hadoop-*streaming*.jar -file /Users/trilce/icarus/UNM/teaching/BigData13/scripts/hadoop/wordcount-mapper.py -mapper /Users/trilce/icarus/UNM/teaching/BigData13/scripts/hadoop/wordcount-mapper.py -file /Users/trilce/icarus/UNM/teaching/BigData13/scripts/hadoop/wordcount-reducer.py -reducer /Users/trilce/icarus/UNM/teaching/BigData13/scripts/hadoop/wordcount-reducer.py -input /user/trilce/gutenberg/* -output /user/trilce/gutemberg-output-py
+
+13/09/10 16:48:50 INFO mapred.FileInputFormat: Total input paths to process : 3
+13/09/10 16:48:50 INFO streaming.StreamJob: getLocalDirs(): [/tmp/hadoop-trilce/mapred/local]
+13/09/10 16:48:50 INFO streaming.StreamJob: Running job: job_201309101642_0001
+13/09/10 16:48:50 INFO streaming.StreamJob: To kill this job, run:
+13/09/10 16:48:50 INFO streaming.StreamJob: /Volumes/Data/dev/hadoop/hadoop-1.2.1/libexec/../bin/hadoop job  -Dmapred.job.tracker=localhost:9001 -kill job_201309101642_0001
+13/09/10 16:48:50 INFO streaming.StreamJob: Tracking URL: http://localhost:50030/jobdetails.jsp?jobid=job_201309101642_0001
+13/09/10 16:48:51 INFO streaming.StreamJob:  map 0%  reduce 0%
+13/09/10 16:48:55 INFO streaming.StreamJob:  map 67%  reduce 0%
+13/09/10 16:48:57 INFO streaming.StreamJob:  map 100%  reduce 0%
+13/09/10 16:49:02 INFO streaming.StreamJob:  map 100%  reduce 33%
+13/09/10 16:49:05 INFO streaming.StreamJob:  map 100%  reduce 100%
+13/09/10 16:49:06 INFO streaming.StreamJob: Job complete: job_201309101642_0001
+13/09/10 16:49:06 INFO streaming.StreamJob: Output: /user/trilce/gutemberg-output
+
+
+NOTE:
+
+To make available the mapper and reducer locally in the compute nodes, use the -file param
+
+bin/hadoop jar contrib/streaming/hadoop-*streaming*.jar -file scripts/wordcount-mapper.py -mapper scripts/wordcount-mapper.py -file scripts/wordcount-reducer.py -reducer scripts/wordcount-reducer.py -input /user/trilce/gutemberg/* -output /user/trilce/gutemberg-output
+
+
+Explore the output
+===================
+bin/hadoop fs -cat gutemberg-output/*
+
++++++++++++++
+Link to the tutorial: http://www.michael-noll.com/tutorials/writing-an-hadoop-mapreduce-program-in-python/
++++++++++++++

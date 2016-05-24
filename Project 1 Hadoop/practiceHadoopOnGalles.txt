@@ -1,0 +1,24 @@
+/*************************************
+/*compile WordCount.java on galles163
+/*************************************
+javac -classpath /opt/local/data_science/hadoop/share/hadoop/common/hadoop-common-2.6.0.jar:/opt/local/data_science/hadoop/share/hadoop/common/lib/hadoop-annotations-2.6.0.jar:/opt/local/data_science/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-core-2.6.0.jar -d /users/chen_xy/scripts/wordcount_classes/ /users/chen_xy/scripts/WordCount.java
+
+
+/**************************************
+/*run wordcount-mapper/reducer.py local
+/**************************************
+cat ./gutemberg/pg5000.txt | ./wordcount-mapper.py  | sort -k1,1 | ./wordcount-reducer.py 
+
+/**************************************
+/*find streaming* .jar
+/**************************************
+find /opt/local/data_science/hadoop/ \-name "*stream*" -print
+
+/*****************************************
+/*use streaming*.jar to run wordcount-*.py
+/*****************************************
+hadoop jar /opt/local/data_science/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.6.0.jar -mapper ./wordcount-mapper.py -reducer wordcount-reducer.py -input /users/chen_xy/gutemberg/* -output /users/chen_xy/gutemberg-output
+
+
+
+

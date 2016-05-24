@@ -1,0 +1,23 @@
+# imports
+import csv
+import re
+
+# lists
+wlist = []
+weights = []
+reviews = []
+
+csvrd = open('labeledBow.feat', 'r')
+tempReviews = csv.reader(csvrd)
+
+for row in tempReviews:
+    reviews.append(row)
+    
+
+with open('imdbEr.txt', 'rb') as fp:
+    wlist = fp.readlines()
+    weights = []
+
+for item in wlist:
+    weights.append(item.strip('\n'))
+

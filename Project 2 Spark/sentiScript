@@ -1,0 +1,3 @@
+bin/hadoop jar share/hadoop/tools/lib/hadoop-streaming-2.7.0.jar  -mapper ~/Documents/CS567/commMapper.py -reducer ~/Documents/CS567/commReducer.py -input /user/labeledBow.feat -output /user/senti-output
+
+bin/hadoop jar share/hadoop/tools/lib/hadoop-streaming-2.7.0.jar  -mapper ~/Documents/CS567/senti/senti-mapper.py -reducer ~/Documents/CS567/senti/senti-reducer.py -cacheFile /user/imdbErOld.txt#ref -input /user/labeledBow.feat -output /user/senti-output
